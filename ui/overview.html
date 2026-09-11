@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>KubeVirt</title>
+        <link rel="stylesheet" href="kubevirt.css" />
+        <!-- The bridge to the app. Served by k8sdockside itself, always at this path. -->
+        <script src="/plugin-ui/_sdk/k8sdockside.js"></script>
+    </head>
+    <body class="page page-overview">
+        <p id="error" class="banner error" hidden></p>
+
+        <!-- A verdict, what the fleet is doing, and every machine at once. -->
+        <section id="hero" class="hero">
+            <div class="loading"><span class="pulse"></span><span>Looking for KubeVirt…</span></div>
+        </section>
+
+        <!-- The fleet by state, and what it adds up to. -->
+        <section id="strip" class="strip" hidden></section>
+
+        <div id="columns" class="columns" hidden>
+            <div id="left" class="column">
+                <section id="needs" class="card"></section>
+            </div>
+            <div class="column">
+                <section id="nodes" class="card"></section>
+                <section id="migrations" class="card"></section>
+            </div>
+        </div>
+
+        <div id="lower" class="columns" hidden>
+            <section id="system" class="card"></section>
+            <section id="activity" class="card"></section>
+        </div>
+
+        <section id="history" class="history" hidden></section>
+
+        <footer id="foot" class="foot" hidden></footer>
+
+        <!-- Classic scripts, not type="module": a sandboxed frame has an opaque
+             origin, so a module would be a cross-origin load. -->
+        <script src="model.js"></script>
+        <script src="kit.js"></script>
+        <script src="overview.js"></script>
+    </body>
+</html>
