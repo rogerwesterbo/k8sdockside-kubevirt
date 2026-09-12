@@ -38,6 +38,8 @@
         eventsAt: 0,
         busy: false,
         notice: null,
+        // How wide the drawer was dragged; empty is the stylesheet's width.
+        width: '',
     };
 
     var $ = function (id) {
@@ -56,7 +58,7 @@
     // The filters and the selection live in the frame's own hash, so
     // switching tabs away and back -- which unloads the page -- comes back to
     // them.
-    var REMEMBERED = ['group', 'status', 'namespace', 'node', 'selected'];
+    var REMEMBERED = ['group', 'status', 'namespace', 'node', 'selected', 'width'];
 
     function saveHash() {
         var parts = [];
@@ -886,6 +888,24 @@
 
     loadHash();
     drawGroupControl();
+    // The drawer is as wide as it was left: the width is kept in the hash
+    // with the rest of the board's state.
+    document.body.appendChild(
+        K.grip({
+            panel: $('drawer'),
+            prop: '--drawer-w',
+            className: 'drawer-grip',
+            min: 380,
+            room: 360,
+            initial: Number(state.width) || 0,
+            label: 'Resize the machine drawer',
+            onResize: function (px, done) {
+                if (!done) return;
+                state.width = px ? String(px) : '';
+                saveHash();
+            },
+        }),
+    );
 
     sdk.ready()
         .then(function (context) {
