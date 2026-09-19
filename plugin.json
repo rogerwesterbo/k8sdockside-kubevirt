@@ -3,10 +3,11 @@
     "id": "kubevirt",
     "name": "KubeVirt",
     "version": "1.0.0",
-    "minAppVersion": "0.0.15",
+    "minAppVersion": "0.0.30",
     "author": "Roger Westerbo",
     "tagline": "virtual machines as Kubernetes objects",
     "icon": "display",
+    "logo": "logo.svg",
     "docs": "https://kubevirt.io/user-guide/",
     "links": [
         { "label": "kubevirt.io", "url": "https://kubevirt.io" },
