@@ -711,30 +711,101 @@
 
     // ----- nodes -----------------------------------------------------------------
 
+    // The conditions a node raises when it is short of something; any of
+    // them True is worth a person's look.
+    var PRESSURES = ['MemoryPressure', 'DiskPressure', 'PIDPressure', 'NetworkUnavailable'];
+
     function nodeFacts(node) {
         var l = labelsOf(node);
         var alloc = dig(node, 'status.allocatable') || {};
+        var info = dig(node, 'status.nodeInfo') || {};
         var ready = conditionOf(node, 'Ready');
         return {
             name: node.metadata.name,
             obj: node,
             ready: !ready || ready.status === 'True',
+            readyWhy: ready && ready.status !== 'True' ? ready.message || ready.reason || '' : '',
             cordoned: !!dig(node, 'spec.unschedulable'),
             schedulable: l['kubevirt.io/schedulable'] === 'true',
             kvm: quantity(alloc['devices.kubevirt.io/kvm']) > 0,
             cpu: quantity(alloc.cpu),
             memory: quantity(alloc.memory),
+            pods: quantity(alloc.pods),
+            pressure: PRESSURES.filter(function (t) {
+                return conditionIs(node, t, 'True');
+            }),
+            taints: (dig(node, 'spec.taints') || []).map(function (t) {
+                return t.key + (t.value ? '=' + t.value : '') + ':' + t.effect;
+            }),
+            roles: Object.keys(l)
+                .filter(function (k) {
+                    return k.indexOf('node-role.kubernetes.io/') === 0;
+                })
+                .map(function (k) {
+                    return k.slice('node-role.kubernetes.io/'.length);
+                })
+                .filter(Boolean),
+            kubelet: info.kubeletVersion || '',
+            os: info.osImage || '',
+            kernel: info.kernelVersion || '',
+            arch: info.architecture || l['kubernetes.io/arch'] || '',
+            runtime: info.containerRuntimeVersion || '',
+            cpuModel: hostModel(l),
+            zone: l['topology.kubernetes.io/zone'] || '',
+            created: time(node.metadata.creationTimestamp),
         };
+    }
+
+    // The CPU model virt-handler labels the node with, when it has.
+    function hostModel(labels) {
+        var prefix = 'host-model-cpu.node.kubevirt.io/';
+        var keys = Object.keys(labels).filter(function (k) {
+            return k.indexOf(prefix) === 0;
+        });
+        return keys.length ? keys[0].slice(prefix.length) : '';
     }
 
     // The nodes that carry guests, or could: which machines are on each, and
     // how much of it their launcher pods have asked for.
-    function buildNodes(nodes, machines, launchers) {
+    //
+    // handlers, when given, are the virt-handler pods: each node learns
+    // whether one runs there and is ready, since no guest can start on a node
+    // without it.
+    function buildNodes(nodes, machines, launchers, handlers) {
         var by = {};
         var order = [];
         function slot(name) {
             if (!by[name]) {
-                by[name] = { name: name, obj: null, known: false, ready: true, cordoned: false, schedulable: false, kvm: false, cpu: 0, memory: 0, guests: [], requested: { cpu: 0, memory: 0 }, vcpus: 0, guestMemory: 0 };
+                by[name] = {
+                    name: name,
+                    obj: null,
+                    known: false,
+                    ready: true,
+                    readyWhy: '',
+                    cordoned: false,
+                    schedulable: false,
+                    kvm: false,
+                    cpu: 0,
+                    memory: 0,
+                    pods: 0,
+                    pressure: [],
+                    taints: [],
+                    roles: [],
+                    kubelet: '',
+                    os: '',
+                    kernel: '',
+                    arch: '',
+                    runtime: '',
+                    cpuModel: '',
+                    zone: '',
+                    created: 0,
+                    handler: '',
+                    launchers: 0,
+                    guests: [],
+                    requested: { cpu: 0, memory: 0 },
+                    vcpus: 0,
+                    guestMemory: 0,
+                };
                 order.push(name);
             }
             return by[name];
@@ -764,7 +835,24 @@
             var r = requestsOf(p);
             by[node].requested.cpu += r.cpu;
             by[node].requested.memory += r.memory;
+            by[node].launchers++;
         });
+        // '' when not known; 'ready', 'not ready' or 'missing' otherwise.
+        if (handlers) {
+            var handlerOn = {};
+            handlers.forEach(function (p) {
+                if (labelsOf(p)['kubevirt.io'] !== 'virt-handler') return;
+                var node = dig(p, 'spec.nodeName');
+                if (!node) return;
+                var ok = dig(p, 'status.phase') === 'Running' && conditionIs(p, 'Ready', 'True');
+                if (handlerOn[node] !== 'ready') handlerOn[node] = ok ? 'ready' : 'not ready';
+            });
+            var anyHandler = Object.keys(handlerOn).length > 0;
+            order.forEach(function (n) {
+                if (handlerOn[n]) by[n].handler = handlerOn[n];
+                else if (anyHandler && by[n].schedulable) by[n].handler = 'missing';
+            });
+        }
         return order
             .map(function (n) {
                 var s = by[n];
@@ -992,7 +1080,7 @@
         });
         machines.sort(worstFirst);
 
-        var nodes = buildNodes(got.nodes.items, machines, got.launchers.items);
+        var nodes = buildNodes(got.nodes.items, machines, got.launchers.items, got.components.ok ? got.components.items : null);
         var system = buildSystem(got.kubevirts.items, got.kubevirts.ok, got.components.items, got.components.ok, got.cdi.items);
 
         var groups = {};

@@ -368,6 +368,13 @@
                 return n.schedulable;
             }).length;
             if (able) head.appendChild(el('span', 'faint small', M.plural(able, 'node') + ' can run VMs' + (kvm < able ? ' · ' + kvm + ' with KVM' : '')));
+            if (model.nodes.length) {
+                head.appendChild(
+                    K.button('All nodes', 'ghost small head-go', 'arrow', function () {
+                        openView('nodes');
+                    }),
+                );
+            }
             box.appendChild(head);
 
             if (!model.nodes.length) {
@@ -425,7 +432,15 @@
                 ul.appendChild(li);
             });
             box.appendChild(ul);
-            if (model.nodes.length > 12) box.appendChild(el('p', 'faint small', 'and ' + (model.nodes.length - 12) + ' more nodes'));
+            if (model.nodes.length > 12) {
+                var more = el('div', 'card-tools');
+                more.appendChild(
+                    K.button('Show all ' + model.nodes.length + ' nodes', 'ghost small', 'arrow', function () {
+                        openView('nodes');
+                    }),
+                );
+                box.appendChild(more);
+            }
             box.appendChild(el('p', 'foot-note', 'The bars are what the guests’ virt-launcher pods ask the scheduler for, against what each node can give.'));
         });
     }

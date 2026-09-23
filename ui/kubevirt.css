@@ -1009,6 +1009,14 @@ button.link-chip .ico {
     margin-left: auto;
 }
 
+.card-head > .head-go {
+    margin-left: auto;
+}
+
+.card-head > .faint + .head-go {
+    margin-left: 4px;
+}
+
 .card-tools {
     display: flex;
     flex-wrap: wrap;
@@ -2566,5 +2574,208 @@ body.page-section {
     *::after {
         animation: none !important;
         transition: none !important;
+    }
+}
+
+/* ----- the nodes page ------------------------------------------------------ */
+
+.nodes-page {
+    padding: 0 22px 36px;
+}
+
+.nodes-page .strip {
+    margin-top: 16px;
+}
+
+.nfilters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0 12px;
+}
+
+.nfilters .segmented button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.seg-count {
+    font-size: 11px;
+    color: var(--k-faint);
+    font-variant-numeric: tabular-nums;
+}
+
+.nfilter-tools {
+    margin-left: auto;
+}
+
+.nfilter-tools button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ncard {
+    padding: 4px 16px;
+    border-radius: 14px;
+    background: var(--k-panel);
+    border: 1px solid var(--k-soft);
+    border-left: 3px solid var(--k-soft);
+}
+
+.ncard.warn,
+.ncard.error {
+    border-left-color: var(--tone);
+}
+
+.ncard .host {
+    border-top: 0;
+    padding: 10px 0;
+}
+
+.ncard .host-name {
+    align-items: flex-start;
+}
+
+.nname {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.nname .link {
+    font-weight: 600;
+    text-align: left;
+}
+
+.ncard .host-badges {
+    flex-basis: 100%;
+}
+
+.ncard .host-name {
+    flex-wrap: wrap;
+}
+
+.ncard .host-name .ntoggle {
+    flex: none;
+}
+
+button.ntoggle {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: none;
+    color: var(--k-faint);
+}
+
+button.ntoggle .ico {
+    transition: transform 0.15s ease;
+}
+
+.ncard.open button.ntoggle .ico {
+    transform: rotate(90deg);
+}
+
+.meter-row.wide {
+    grid-template-columns: 48px minmax(40px, 1fr) 36px minmax(0, auto);
+}
+
+.meter-abs {
+    font-size: 10.5px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.nmore {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 2fr);
+    gap: 18px;
+    padding: 12px 0 14px;
+    border-top: 1px solid var(--k-soft);
+}
+
+@media (max-width: 900px) {
+    .nmore {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nfacts {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 5px 12px;
+    margin: 0;
+    font-size: 12px;
+    align-content: start;
+}
+
+.nfacts dt {
+    color: var(--k-faint);
+}
+
+.nfacts dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.nfacts dd.pre {
+    white-space: pre-line;
+    font-size: 11px;
+}
+
+.ntable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.ntable th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--k-faint);
+    padding: 0 8px 6px 0;
+}
+
+.ntable td {
+    padding: 5px 8px 5px 0;
+    border-top: 1px solid var(--k-soft);
+    vertical-align: middle;
+}
+
+.ntable td.num {
+    font-variant-numeric: tabular-nums;
+}
+
+.ntable-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ntable .chip {
+    font-size: 10.5px;
+    padding: 1px 7px;
+}
+
+@media (max-width: 640px) {
+    .nodes-page {
+        padding: 0 14px 30px;
     }
 }

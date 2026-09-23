@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>KubeVirt nodes</title>
+        <link rel="stylesheet" href="kubevirt.css" />
+        <!-- The bridge to the app. Served by k8sdockside itself, always at this path. -->
+        <script src="/plugin-ui/_sdk/k8sdockside.js"></script>
+    </head>
+    <body class="page page-nodes">
+        <header class="top">
+            <div class="brand">
+                <span class="logo" id="logo"></span>
+                <div>
+                    <h1>Nodes</h1>
+                    <p id="where" class="faint">Connecting…</p>
+                </div>
+            </div>
+            <label class="search">
+                <span id="search-icon"></span>
+                <input id="query" type="search" placeholder="Find a node, a guest, a version or a taint" autocomplete="off" spellcheck="false" />
+            </label>
+            <div class="segmented" id="sort" role="group" aria-label="Sort by"></div>
+        </header>
+
+        <p id="error" class="banner error" hidden></p>
+        <section id="empty" class="empty" hidden></section>
+
+        <div id="content" class="nodes-page" hidden>
+            <section id="nstrip" class="strip"></section>
+            <div class="nfilters">
+                <div class="segmented" id="filter" role="group" aria-label="Show"></div>
+                <div class="nfilter-tools">
+                    <button type="button" id="expand-all" class="ghost small"></button>
+                </div>
+            </div>
+            <ul id="nlist" class="nlist"></ul>
+        </div>
+
+        <!-- Classic scripts, not type="module": a sandboxed frame has an opaque
+             origin, so a module would be a cross-origin load. -->
+        <script src="model.js"></script>
+        <script src="kit.js"></script>
+        <script src="nodes.js"></script>
+    </body>
+</html>
